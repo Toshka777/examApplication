@@ -18,6 +18,7 @@ const questions = [
 
 let currentQuestionIndex = 0; // مؤشر السؤال الحالي
 let score = 0; // درجة المستخدم
+let userAnswers = []; // تخزين إجابات المستخدم
 
 const welcomeContainer = document.querySelector(".welcome-container"); // عنصر يحتوي على شاشة الترحيب
 const formContainer = document.querySelector(".form-container"); // عنصر يحتوي على الفورم
@@ -70,21 +71,14 @@ function showQuestion(index) {
     button.textContent = option; // تعيين نص الخيار
     button.addEventListener("click", () => {
       // إضافة مستمع للنقر على الزر
-      if (
-        !document.querySelector(".options button.correct") &&
-        !document.querySelector(".options button.incorrect")
-      ) {
-        // التحقق من عدم وجود إجابة سابقة
-        if (option === question.correctAnswer) {
-          button.classList.add("correct"); // إضافة فئة CSS للإجابة الصحيحة
-          score++; // زيادة الدرجة
-        } else {
-          button.classList.add("incorrect"); // إضافة فئة CSS للإجابة الخاطئة
-        }
-        nextButton.style.display = "block"; // عرض زر الانتقال للسؤال التالي
-        if (currentQuestionIndex === questions.length - 1) {
-          nextButton.textContent = "تسليم الاختبار"; // تغيير نص الزر في السؤال الأخير
-        }
+      userAnswers[index] = option; // تخزين إجابة المستخدم
+      document.querySelectorAll(".options button").forEach((btn) => {
+        btn.classList.remove("selected"); // إزالة الفئة من جميع الأزرار
+      });
+      button.classList.add("selected"); // إضافة الفئة للزر المحدد
+      nextButton.style.display = "block"; // عرض زر الانتقال للسؤال التالي
+      if (currentQuestionIndex === questions.length - 1) {
+        nextButton.textContent = "تسليم الاختبار"; // تغيير نص الزر في السؤال الأخير
       }
     });
     optionsDiv.appendChild(button); // إضافة الزر إلى عنصر الخيارات
@@ -109,7 +103,24 @@ function showResult() {
   questionsContainer.style.display = "none"; // إخفاء عنصر الأسئلة
   nextButton.style.display = "none"; // إخفاء زر الانتقال للسؤال التالي
   resultContainer.style.display = "block"; // عرض عنصر النتيجة النهائية
-  resultContainer.textContent = `لقد أجبت بشكل صحيح على ${score} من ${questions.length} أسئلة.`; // تعيين نص النتيجة النهائية
+
+  let resultHTML = `<h2>نتائج الاختبار</h2>`;
+  questions.forEach((question, index) => {
+    const userAnswer = userAnswers[index];
+    const correctAnswer = question.correctAnswer;
+    const isCorrect = userAnswer === correctAnswer;
+    if (isCorrect) score++;
+    resultHTML += `
+      <div class="result-question">
+        <h3>${question.question}</h3>
+        <p>إجابتك: ${userAnswer} ${isCorrect ? "(صحيحة)" : "(خاطئة)"}</p>
+        ${!isCorrect ? `<p>الإجابة الصحيحة: ${correctAnswer}</p>` : ""}
+      </div>
+    `;
+  });
+
+  resultHTML += `<p>لقد أجبت بشكل صحيح على ${score} من ${questions.length} أسئلة.</p>`;
+  resultContainer.innerHTML = resultHTML;
 
   // إرسال البريد الإلكتروني باستخدام EmailJS عبر fetch
   const username = document.getElementById("username").value;
