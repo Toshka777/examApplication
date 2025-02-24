@@ -33,8 +33,8 @@ setTimeout(() => {
     welcomeContainer.style.display = "none";
     formContainer.style.display = "block";
     formContainer.classList.add("visible");
-  }, 2000); // تأخير لإخفاء شاشة الترحيب بشكل كامل
-}, 3000);
+  }, 1300); // تأخير لإخفاء شاشة الترحيب بشكل كامل
+}, 1500);
 
 document.getElementById("user-form").addEventListener("submit", (e) => {
   e.preventDefault();
