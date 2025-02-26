@@ -120,14 +120,27 @@ function showResult() {
   });
 
   resultHTML += `<p>لقد أجبت بشكل صحيح على ${score} من ${questions.length} أسئلة.</p>`;
+  resultHTML += `<button id="send-button" class="send-button">إرسال الإجابات</button>`; // إضافة زر إرسال الإجابات
   resultContainer.innerHTML = resultHTML;
 
-  // إرسال البريد الإلكتروني باستخدام EmailJS عبر fetch
+  document.getElementById("send-button").addEventListener("click", handleSend);
+}
+
+function handleSend() {
+  if (navigator.onLine) {
+    sendEmail(userAnswers);
+  } else {
+    localStorage.setItem("userAnswers", JSON.stringify(userAnswers));
+    alert("لا يوجد اتصال بالإنترنت. سيتم إرسال الإجابات عند توفر الإنترنت.");
+  }
+}
+
+function sendEmail(answers) {
   const username = document.getElementById("username").value;
   const templateParams = {
     to_email: "yta861356@gmail.com",
     from_name: username,
-    message: `اسم الطالب: ${username}\nالنتيجة: ${resultContainer.textContent}`,
+    message: `اسم الطالب: ${username}\nالنتيجة: ${JSON.stringify(answers)}`,
   };
 
   fetch("https://api.emailjs.com/api/v1.0/email/send", {
@@ -153,3 +166,11 @@ function showResult() {
       console.log("FAILED...", error);
     });
 }
+
+window.addEventListener("online", () => {
+  const storedAnswers = localStorage.getItem("userAnswers");
+  if (storedAnswers) {
+    sendEmail(JSON.parse(storedAnswers));
+    localStorage.removeItem("userAnswers");
+  }
+});
