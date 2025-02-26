@@ -11,9 +11,11 @@ const urlsToCache = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache).catch(error => {
-        console.error('Failed to cache:', error);
-      });
+      return Promise.all(
+        urlsToCache.map(url => 
+          cache.add(url).catch(error => console.warn(`Failed to cache ${url}:`, error))
+        )
+      );
     })
   );
 });
