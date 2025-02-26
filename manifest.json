@@ -7,7 +7,7 @@
   "display": "fullscreen",
   "icons": [
     {
-      "src": "/exam1.png",
+      "src": "/exam.png",
       "sizes": "192x192",
       "type": "image/png"
     },
